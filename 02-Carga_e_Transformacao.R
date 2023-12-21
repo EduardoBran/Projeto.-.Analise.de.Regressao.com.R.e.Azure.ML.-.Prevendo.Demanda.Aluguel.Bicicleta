@@ -81,16 +81,16 @@ str(bikes$dayWeek)
 # Bloco1
 # Se o seu sistema operacional estiver em portugês, execute o comando abaixo.
 bikes$dayWeek <- as.numeric(ordered(bikes$dayWeek, 
-                                    levels = c("segunda-feira", 
-                                               "terça-feira", 
-                                               "quarta-feira", 
-                                               "quinta-feira", 
-                                               "sexta-feira", 
+                                    levels = c("segunda", 
+                                               "terça", 
+                                               "quarta", 
+                                               "quinta", 
+                                               "sexta", 
                                                "sábado", 
                                                "domingo")))
 
 # Bloco2
-# Se o seu sistema operacional estiver em inglês, execute o comando abaixo.
+# Se o seu sistema operacional estiver em inglês, execute o comando abaixo. (No Azure ML tem que ser esse em inglês)
 bikes$dayWeek <- as.numeric(ordered(bikes$dayWeek, 
                                     levels = c("Monday", 
                                                "Tuesday", 
@@ -116,10 +116,12 @@ bikes$xformHr <- ifelse(bikes$hr > 4, bikes$hr - 5, bikes$hr + 19)
 # Considerando horas da madrugada
 bikes$xformWorkHr <- ifelse(bikes$isWorking, bikes$xformHr, bikes$xformHr + 24) 
 
-# str(bikes)
+str(bikes)
 # View(bikes)
 # O trabalho que fizemos até aqui também é chamado de Feature Engineering ou 
 # Engenharia de Atributos
 
 # Gera saída no Azure ML
 if(Azure) maml.mapOutputPort('bikes')
+
+

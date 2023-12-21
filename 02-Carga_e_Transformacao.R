@@ -12,16 +12,11 @@ getwd()
 
 # - Ou seja, na prática estamos resolvendo nosso problema de negócio com dudas ferramentas.
 
-
-
-## Voltando ao Azure ML
-
-# - Criar um novo experimento.
-# - 
+# - Ao final da execução deste script aqui no ambiente R, iremos executar este experimento no ambiente Azure ML
 
 
 
-## R Studio (cript fornecido pelo curso)
+## R Studio (Script fornecido pelo curso)
 
 # Variável que controla a execução do script
 # (Se o valor for FALSE, o codigo sera executado no RStudio)

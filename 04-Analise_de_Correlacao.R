@@ -15,10 +15,7 @@ library(corrplot)
 ## Carregando dataset
 
 # - Lembrando que o nosso dataset já passou pelo processo de transformação no script anterior.
-# - Iremos então carregar este script.
-
-bikes <- read.csv("bikes.csv", sep = ",", header = TRUE, stringsAsFactors = FALSE )
-
+# - Iremos então carregar este script dentro da função abaixo.
 
 # Variável que controla a execução do script
 # (Se o valor for FALSE, o codigo sera executado no RStudio)
@@ -29,7 +26,14 @@ if(Azure){
   bikes <- maml.mapInputPort(1)
   bikes$dteday <- set.asPOSIXct(bikes)
 }else{
-  bikes <- bikes
+  source("src/Tools.R")
+  bikes <- read.csv("bikes.csv", sep = ",", header = TRUE, stringsAsFactors = FALSE )
+  # Transformar o objeto de data
+  bikes$dteday <- char.toPOSIXct(bikes)
+  
+  # Na linha de cima foi gerado dois valores NA
+  # Esta linha abaixo corrige
+  bikes <- na.omit(bikes)
 }
 
 View(bikes)

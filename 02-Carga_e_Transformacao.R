@@ -56,17 +56,23 @@ str(bikes)
 View(bikes)
 
 # Criar uma nova variável para indicar dia da semana (workday)
-bikes$isWorking <- ifelse(bikes$workingday & !bikes$holiday, 1, 0)  
+bikes$isWorking <- ifelse(bikes$workingday & !bikes$holiday, 1, 0)
 
 # Adicionar uma coluna com a quantidade de meses, o que vai ajudar a criar o modelo
 bikes <- month.count(bikes)
 
 # Criar um fator ordenado para o dia da semana, comecando por segunda-feira
 # Neste fator eh convertido para ordenado numérico para ser compativel com os tipos de dados do Azure ML
-bikes$dayWeek <- as.factor(weekdays(bikes$dteday))
+bikes$dayWeek <- as.factor(weekdays(bikes$dteday2))
 
 str(bikes)
 View(bikes)
+
+
+bikes$dteday2 <- bikes$dteday
+source("src/Tools.R")
+bikes$dteday2 <- char.toPOSIXct(bikes)
+bikes <- subset(bikes, select = -c(dteday2))
 
 
 
@@ -107,14 +113,14 @@ str(bikes)
 
 # Adiciona uma variável com valores únicos para o horário do dia em dias de semana e dias de fim de semana
 # Com isso diferenciamos as horas dos dias de semana, das horas em dias de fim de semana
-bikes$workTime <- ifelse(bikes$isWorking, bikes$hr, bikes$hr + 24) 
+bikes$workTime <- ifelse(bikes$isWorking, bikes$hr, bikes$hr + 24)
 
 # Transforma os valores de hora na madrugada, quando a demanda por bibicletas é praticamente nula 
 bikes$xformHr <- ifelse(bikes$hr > 4, bikes$hr - 5, bikes$hr + 19)
 
 # Adiciona uma variável com valores únicos para o horário do dia para dias de semana e dias de fim de semana
 # Considerando horas da madrugada
-bikes$xformWorkHr <- ifelse(bikes$isWorking, bikes$xformHr, bikes$xformHr + 24) 
+bikes$xformWorkHr <- ifelse(bikes$isWorking, bikes$xformHr, bikes$xformHr + 24)
 
 str(bikes)
 # View(bikes)
@@ -125,7 +131,10 @@ str(bikes)
 if(Azure) maml.mapOutputPort('bikes')
 
 
-# Salvando arquivo CSV
-library(tidyverse)
-write_csv(bikes, 'bikes.csv')
 
+library(readr)
+# Salvar o dataframe bikes em um arquivo CSV
+write.csv(bikes, 'bikes.csv', row.names = FALSE, quote = TRUE)
+
+
+head(bikes)

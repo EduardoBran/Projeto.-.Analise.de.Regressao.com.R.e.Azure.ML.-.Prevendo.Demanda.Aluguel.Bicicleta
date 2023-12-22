@@ -89,9 +89,6 @@ if(Azure) maml.mapOutputPort('bikes')
 cor_matrix <- cor(bikes[, cols])
 cor_matrix
 
-cors
-cor_matrix
-
 # E para não ter que analisar somentes os números, vamos criar um gráfico corrplot
 
 # Corrplot (para outras cores usar colors())

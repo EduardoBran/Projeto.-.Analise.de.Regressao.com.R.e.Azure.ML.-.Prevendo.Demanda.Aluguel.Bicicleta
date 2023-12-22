@@ -125,3 +125,7 @@ str(bikes)
 if(Azure) maml.mapOutputPort('bikes')
 
 
+# Salvando arquivo CSV
+library(tidyverse)
+write_csv(bikes, 'bikes.csv')
+

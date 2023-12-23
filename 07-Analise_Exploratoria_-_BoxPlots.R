@@ -1,4 +1,4 @@
-####  Realizando Análise Exploratória - Séries Temporais  ####
+####  Realizando Análise Exploratória - BoxPlots  ####
 
 # Configurando o diretório de trabalho
 setwd("~/Desktop/DataScience/CienciaDeDados/1.Big-Data-Analytics-com-R-e-Microsoft-Azure-Machine-Learning/14.Projeto-de-Analise-de-Regressao-com-R-e-Azure-ML-Prevendo_Demanda_Aluguel_Bicicleta")
@@ -7,6 +7,7 @@ getwd()
 
 ## Carregando pacotes
 library(ggplot2)
+
 
 ## Carregando dataset
 
@@ -44,45 +45,42 @@ View(bikes)
 # - Dentro destas 3 atividades não iremos fazer nenhuma alteração no dados, o objetivo é a melhor compreensão dos dados.
 
 
-## Séries Temporais
+## Boxplots
 
-# - Nossa primeira atividade de Análise Exploratória será uma Análise de Séries Temporais.
-# - Será uma análise simples pois é um tema muito extenso.
-
-#   -> Quando trabalhar com Séries Temporais ?
-
-# - Quando nossos dados estiverem distribuídos com períodos de datas (minutos, horas, dias semana, ano, etc).
-#   Quando os dados não trabalham ou não precisam de datas, nós não trabalhamos com séries temporais.
-
-# - No caso do nosso Projeto Demanda por Aluguéis de Bikes, nós temos o aluguel ao longo de períodos de datas.
-#   Temos bikes alugadas por período de 1 hora, 1 dia ou 1 semana e etc.
-
-# - Portanto, faz sentido realizarmos uma Análise de Séries Temporais para compreendermos se temos algo fora dos limites,
-#   algo fora de padrão ou um padrão não detectado.
+# - É uma boa prática criarmos gráficos Boxplots para compreendermos se temos dados acima da média, outliers ou
+#   como os dados estão relacionados.
 
 
-## Realizando Análise Séries Temporais
+## Criando Gráficos BoxPlots
 
-# Criando um vetor com algumas horas do dia para verificar qual horário tem a maior demanda por aluguel de bikes
-# (pode ser feito com outros valores)
-times <- c(7, 9, 12, 15, 18, 20, 22)
+# Convertendo a variável dayWeek para fator ordenado e plotando em ordem de tempo
+source("src/Tools.R")
+bikes$dayWeek <- fact.conv(bikes$dayWeek)
 
 
-# Função para criar Time Series Plot (plot de Séries Temporais)
-tms.plot <- function(times){
-  ggplot(bikes[bikes$workTime == times, ], aes(x = dteday, y = cnt, group = 1)) + 
-    geom_line() +
-    ylab("Numero de Bikes") +
-    labs(title = paste("Demanda de Bikes as ", as.character(times), ":00", sep = "")) +
-    theme(text = element_text(size = 20))
+# Demanda de bikes x potenciais variáveis preditoras
+labels <- list("Boxplots - Demanda de Bikes por Hora",
+               "Boxplots - Demanda de Bikes por Estação",
+               "Boxplots - Demanda de Bikes por Dia Útil",
+               "Boxplots - Demanda de Bikes por Dia da Semana")
+
+xAxis <- list("hr", "weathersit", "isWorking", "dayWeek")
+
+# Função para criar os boxplots
+plot.boxes  <- function(X, label){ 
+  ggplot(bikes, aes_string(x = X, y = "cnt", group = X)) + 
+    geom_boxplot( ) + 
+    ggtitle(label) +
+    theme(text = element_text(size = 18)) 
 }
 
-# Visualizando o plot
-lapply(times, tms.plot)
+# Gerando gráficos
+Map(plot.boxes, xAxis, labels)
 
 
-# Gera saida no Azure ML
+# Gera saída no Azure ML
 if(Azure) maml.mapOutputPort('bikes')
+
 
 
 ## Voltar Ao Azure ML e colar o código aicma no último módulo de "Execute R Script" onde já temos gráficos de correlação.

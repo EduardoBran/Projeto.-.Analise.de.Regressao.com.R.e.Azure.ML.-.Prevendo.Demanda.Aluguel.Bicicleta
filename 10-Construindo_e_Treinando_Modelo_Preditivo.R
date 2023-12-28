@@ -39,12 +39,6 @@ if(Azure){
 View(bikes)
 
 
-## Cria um modelo preditivo usando randomForest
-
-
-
-
-
 
 ## Voltando ao Azure ML
 
@@ -79,7 +73,7 @@ View(bikes)
 # - Conectar a segunda saída do módulo "Split Data" na segunda entrada do módulo "Score Model"
 # - Conectar o módulo "Score Model" no módulo "Evaluate Model"
 
-## Interpretaendo a avaliação do modelo
+## Interpretando a avaliação do modelo
 
 # - Após executar o experimento, clicar na saída do módulo "Evaluate Model"
 #  -> Ficar atento ao valor do "Coefficient of Determination" que seria o R-squared
@@ -87,6 +81,32 @@ View(bikes)
 # - Nosso valor foi de 0.31 , o que indica um resultado muito ruim (apesar de ser "normal" para um primeiro modelo).
 #   Este valor é de 0.0 a 1.0, e o nosso foi 0.3.
 
+# - O valor "aceitável" é acima de 0.70 , desta forma iríamos fazendo ajustes pontuais para melhorar a performance até atingir
+#   a valores como 0.93 a 0.95.
+
 
 ## Como melhorar a performance do modelo ?
+
+# - Como nós obtivemos um valor "Coefficient of Determination" (R-sqaured) de apenas 0.31, o indicado é trocar o tipo de algoritimo.
+
+# - Deletar o módulo "Linear Regression"
+
+# - Procurar o arrastar o módulo "Boosted Decision Tree Regression"
+
+# - Conectar o módulo "Boosted Decision Tree Regression" na primeira entrada do módulo "Train Model" 
+
+# - Avaliar o modelo com novo algortimo clicando no módulo "Evaluate Model"
+#   -> Agora conseguimos um valor "Coefficient of Determination" (R-sqaured) de 0.93
+
+
+
+
+## Criando um outro algoritmo usando linguagem R para comparar ao algoritmo Boosted Decision Tree Regressio do Azure ML
+
+
+
+
+
+
+
 

@@ -339,3 +339,12 @@ if(Azure) maml.mapOutputPort('outFrame')
 # - Agora clicar na segunda porta de saída do módulo "Execute R Script" para visualizar os resultados
 
 
+## Interpretando os Resíduos
+
+# - Podemos interpretar observando os gráficos que os dados outliers não conseguiram ser previsto e talvez seja melhor remove-los 
+#   no dataset original
+
+# - No gráfico de histograma podemos obervar que a maioria dos valores está concentrada em torno de zero
+#   Isso indica que nosso modelo tem uma boa taxa de previsão afinal a diferença dos valores reais para os previstos estão "iguais" a zero
+
+

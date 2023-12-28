@@ -211,4 +211,131 @@ scores <- data.frame(actual = bikes$cnt,
 
 ## Treinando o Modelo
 
-# - 
+# - Procurar e arrastar o módulo "Split Data"
+# - Procurar e arrastar o módulo "Train Model"
+# - Procurar e arrastar o módulo "Score Model"
+
+# - Como o nosso algoritmo no módulo "Create R Model" já faz a seleção de variáveis, estaria incorreto ligar o módulo 
+#   "Filter Based Feature Selection" nele.
+# - Dito isso, vamos conectar o primeiro módulo "Execute R Script" no módulo "Split Data"
+# - Configurar o módulo "Split Data"
+#  -> Em Splitting mode deixar "Split Rows", modificar Fraction para 0.7 e adicionar 6289 em Random seed.
+
+# - Conectar a primeira porta de saída de "Split Data" na segunda porta de entrada de "Train Model"
+# - Conectar o módulo "Create R Model" na primeira porta de entrada de "Train Model"
+# - Configurar o módulo "Train Model"
+#  -> Escolher a variável alvo cnt
+
+# - Conectar módulo "Train Model" na primeira porta de entrada de "Score Model"
+# - Conectar segunda porta de saída de "Split Data" na segunda porta de entrada de "Score Model"
+
+
+## Analisando Nosso Modelo
+
+# - Clicar no módulo "Score Model" e observando temos as colunas "actual" e "prediction" e conseguimos comparar os resultados
+
+# - A diferença do valores "actual" e o "prediction" é chamada de Resíduos
+# - Podemos fazer análises sobre estes Resíduos para melhorar a performance do modelo
+
+
+## Computação dos Resíduos do Modelo
+
+# - Procurar e arrastar o módulo "Select Columns in Dataset"
+# - Procurar e arrastar o módulo "Execute R Script"
+
+# - Conectar o módulo "Score Model" no módulo "Select Columns in Dataset"
+# - Configurar o módulo "Select Columns in Dataset"
+#  -> Escolher as colunas cnt, prediction
+
+# - Conectar o módulo "Select Columns in Dataset" na primeira porta de entrada de "Execute R Script"
+# - Conectar a segunda porta de saída do módulo "Split Data" (dados de teste) na segunda porta de entrada de "Execute R Script"
+# - Conectar o módulo "Tools.zip" na terceira porta de entrada do módulo "Escute R Script"
+
+# - No módulo "Execute R Script" colar o seguinte código:
+
+# Variável que controla a execução do script
+Azure <- TRUE
+
+if(Azure){
+  source("src/Tools.R")
+  inFrame <- maml.mapInputPort(1)
+  refFrame <- maml.mapInputPort(2)
+  refFrame$dteday <- set.asPOSIXct2(refFrame)
+}else{
+  source("src/Tools.R")
+  inFrame <- scores[, c("actual", "prediction")]
+  refFrame <- bikes
+}
+
+# Criando um dataframe
+inFrame[, c("dteday", "monthCount", "hr", "xformWorkHr")] <- refFrame[, c("dteday", "monthCount", "hr", "xformWorkHr")]
+
+# Nomeando o dataframe
+names(inFrame) <- c("cnt", "predicted", "dteday", "monthCount", "hr", "xformWorkHr")
+
+#  Time series plot mostrando a diferença entre valores reais e valores previstos
+library(ggplot2)
+inFrame <- inFrame[order(inFrame$dteday),]
+s <- c(7, 9, 12, 15, 18, 20, 22)
+
+lapply(s, function(s){
+  ggplot() +
+    geom_line(data = inFrame[inFrame$hr == s, ], 
+              aes(x = dteday, y = cnt)) +
+    geom_line(data = inFrame[inFrame$hr == s, ], 
+              aes(x = dteday, y = predicted), color = "red") +
+    ylab("Numero de Bikes") +
+    labs(title = paste("Demanda de Bikes as ",
+                       as.character(s), ":00", spe ="")) +
+    theme(text = element_text(size = 20))
+})
+
+# Computando os resíduos
+library(dplyr)
+inFrame <-  mutate(inFrame, resids = predicted - cnt)
+
+# Plotando os resíduos
+ggplot(inFrame, aes(x = resids)) + 
+  geom_histogram(binwidth = 1, fill = "white", color = "black")
+
+qqnorm(inFrame$resids)
+qqline(inFrame$resids)
+
+# Plotando os resíduos com as horas transformadas
+inFrame <- mutate(inFrame, fact.hr = as.factor(hr),
+                  fact.xformWorkHr = as.factor(xformWorkHr))                                  
+facts <- c("fact.hr", "fact.xformWorkHr") 
+lapply(facts, function(x){ 
+  ggplot(inFrame, aes_string(x = x, y = "resids")) + 
+    geom_boxplot( ) + 
+    ggtitle("Residuos - Demanda de Bikes por Hora - Atual vs Previsto")})
+
+
+# Mediana dos resíduos por hora
+evalFrame <- inFrame %>%
+  group_by(hr) %>%
+  summarise(medResidByHr = format(round(
+    median(predicted - cnt), 2), 
+    nsmall = 2)) 
+
+# Computando a mediana dos resíduos
+tempFrame <- inFrame %>%
+  group_by(monthCount) %>%
+  summarise(medResid = median(predicted - cnt)) 
+
+evalFrame$monthCount <- tempFrame$monthCount
+evalFrame$medResidByMcnt <- format(round(
+  tempFrame$medResid, 2), 
+  nsmall = 2)
+
+print("Resumo dos residuos")
+print(evalFrame)
+
+# Output
+outFrame <- data.frame(evalFrame)
+if(Azure) maml.mapOutputPort('outFrame')
+
+
+# - Agora clicar na segunda porta de saída do módulo "Execute R Script" para visualizar os resultados
+
+

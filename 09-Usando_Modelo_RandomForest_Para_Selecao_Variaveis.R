@@ -102,7 +102,7 @@ barplot(varImportance[, 1], main = "Importância das Variáveis", col = "skyblue
 
 # Modelo 2 (Seleção de Variáveis)
 
-modelo2 <- randomForest(cnt ~ hum + hr + temp + dteday + xformWorkHr,
+modelo2 <- randomForest(cnt ~ hum + temp + dteday + xformWorkHr,
                        data = bikes, ntree = 100, nodesize = 10, importance = TRUE)
 
 # - para este tipo de problema (técnica de feature selecion o atributo "importante = TRUE" precsa estar)
@@ -125,15 +125,31 @@ barplot(varImportance2[, 1], main = "Importância das Variáveis", col = "skyblu
 
 ## Técnica 2 - Usando o Módulo Filter Based Feature Selection no Azure ML
 
-# Voltando ao Azure ML
+
+## Voltando ao Azure ML
+
+# Vamos continuar no último Experimento criado no Azure ML (Modelo Preditivo Demanda por Aluguel de Bikes)
+
+# - Procurar e arrastar o módulo "Select Columns in Dataset"
+# - Procurar e arrastar o módulo "Filter Based Feature Selection"
+
+# - Conectar o primeiro módulo de "Execute R Script" no módulo "Select Columns in Dataset"
+# - Editar o módulo  "Select Columns in Dataset" escolhendo as mesmas variáveis do modelo 2
+
+# - Conectar o módulo "Select Columns in Dataset" no módulo "Filter Based Feature Selection"
+# - Configurar o módulo "Filter Based Feature Selection"
+#  -> Escolher o tipo do médodo de seleção (indicados: Pearson, Kendall ou Spearman e quando se tem muitas variáveis
+#                                           categóricas: Chi Squared)
+
+# - Foi o escolhido o tipo de método Kendall pois é um teste que utiliza método não paramétrico com isso é um teste mais 
+#   computacionalmente intensivo, o que é mais indicado quando estamos usando ambiente em nuvem (no pc levaria mais tempo)
+
+# - Na sequência em "Target column" escolher a variável preditora (cnt)
+# - Na sequência em "Number of desire features" escolher um valor de quantas variáveis possivelmente relevantes iremos exibir ao final.
+#   Para este exemplo foi escolhido exibir 4 variáveis
 
 
-
-
-
-
-
-
-
+#  -> Por fim podemos afirmar que: O módulo "Filter Based Feature Selection" é utilizado para aplicar técnicas de seleção de 
+#     características baseadas em filtros, como correlação, para identificar as variáveis mais relevantes para o seu modelo.
 
 

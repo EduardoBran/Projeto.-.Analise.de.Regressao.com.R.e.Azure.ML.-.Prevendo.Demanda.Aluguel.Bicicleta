@@ -348,3 +348,7 @@ if(Azure) maml.mapOutputPort('outFrame')
 #   Isso indica que nosso modelo tem uma boa taxa de previsão afinal a diferença dos valores reais para os previstos estão "iguais" a zero
 
 
+## Otimizando o Modelo
+
+# - Um das formas para otimizar o modelo seria a modificação dos parâmetros nas configurações no módulo "Boosted Decision Tree Regression".
+#   Para modificar os parâmetros de um algorotimo é importante saber como funciona o algoritimo.
